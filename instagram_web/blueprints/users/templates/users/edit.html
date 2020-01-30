@@ -1,0 +1,28 @@
+{% extends '_layout.html' %}
+{% block content %}
+<h1>Hi {{ current_user.username }} !! So you'd like to change your profile deets eh?</h1>
+<form action="{{ url_for('users.update', id=current_user.id) }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <label>New Username:</label>
+    <input type="text" name="user_name" class="form-control" value="{{current_user.username}}"/>
+    <label>New Email:</label>
+    <input type="text" name="user_email" class="form-control" value="{{current_user.email}}"/>
+    <label>New Password:</label>
+    <input type="password" name="new_password" class="form-control" required/>
+    <label>Confirm New Password:</label>
+    <input type="password" name="new_password_confirmation" class="form-control" required />
+    <!-- <input type="file" name="new_profile_img" class="form-control"/> -->
+    <a href="{{url_for('users.edit_img')}}">Change user profile image here!!!</a>
+    <button type="submit">Submit</button>
+</form>
+
+{% if errors %}
+
+{% for error in errors %}
+<h3 style="color: red;">{{ error }}</h3> 
+{% endfor %}
+
+
+{% endif %}
+
+{% endblock %}

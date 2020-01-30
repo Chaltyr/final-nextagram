@@ -1,0 +1,15 @@
+{% extends '_layout.html' %}
+{% block content %}
+<h1>Edit img here</h1>
+
+<form action="{{ url_for('users.img_update') }}" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> 
+    <input type="file" name="new_profile_img" class="form-control"/>
+
+    <input type="submit" class="form-control"/>
+
+</form>
+{% if error %}
+<p>{{ error }}</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "_layout.html" %}
+{% block content %}
+
+<h1>Welcome to your profile page! </h1>
+
+<h2>{{ user.username }}</h2>
+
+<div>
+    <h3>Your images, you degenerate.</h3>
+    {% for image in images %}
+    <img src="{{ aws_domain }}{{ user_images.user_img }}" width="70" height="100"/><br/>
+    {% endfor %}
+
+</div>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "_layout.html" %}
+
+{% block title %}
+  Homepage
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+  <h1>Homepage</h1>
+  {% if current_user.is_authenticated %}
+  <h2>Hi, {{ current_user.username }}</h2>
+  {% endif %}
+  <h3>Users</h3>
+  {% for user in users %}
+  <a href="{{ url_for('users.show', username=user.username) }}">{{ user.username }}</a>
+  <img src="{{ aws_domain }}{{ user.profile_img }}" width="70" height="100"/><br/>
+  {% endfor %}
+{% endblock %}
