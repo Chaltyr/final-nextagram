@@ -10,6 +10,78 @@ class User(UserMixin, BaseModel):
     password = pw.CharField()
     profile_img = pw.CharField(default = "82713262_2682749128428457_8666411295068651520_o.jpg")
 
+    def follow(self, user):
+        from models.follow import Follow
+        if self.id != user.id and self.is_following(user) == False and self.is_requesting(user) == False:
+            follow = Follow(follower_id=self.id, followed_id=user.id)
+            follow.save()
+        else:
+            return 0
+
+    def approve(self, user):
+        from models.follow import Follow
+        if user.is_requesting(self):
+            Follow.update(approve=True).where(Follow.followed_id == self.id, Follow.follower_id == user.id).execute()
+        else:
+            return 0
+
+    def get_requests(self):
+        from models.follow import Follow
+        result = User.select().join(Follow, on=(follower_id==User.id).where(Follow.followed_id==self.id, Follow.approved==False))
+        return result
+
+    def get_follower(self):
+        from models.follow import Follow
+        result = User.select().join(Follow, on=(follower_id==User.id).where(Follow.followed_id==self.id, Follow.approved==True))
+        return result
+
+    def get_requesting(self):
+        from models.follow import Follow
+        result = User.select().join(Follow, on=(followed_id==User.id).where(Follow.follower_id==self.id, Follow.approved==False))
+        return result
+
+    def get_following(self):
+        from models.follow import Follow
+        result = User.select().join(Follow, on=(followed_id==User.id).where(Follow.follower_id==self.id, Follow.approved==True))
+        return result
+
+    def is_following(self, user):
+        from models.follow import Follow
+        result = Follow.select().where(Follow.follower_id == self.id, Follow.followed_id == user.id, Follow.approved== True)
+        if len(result) > 0:
+            return True
+        else:
+            return False
+
+    def is_requesting(self, user):
+        from models.follow import Follow
+        result = Follow.select().where(Follow.follower_id == self.id, Follow.followed_id == user.id, Follow.approved== False)
+        if len(result) > 0:
+            return True
+        else:
+            return False
+
+    def unfollow(self, user):
+        from models.follow import Follow
+        if self.is_following(user):
+            Follow.delete().where(Follow.follower_id == self.id, Follow.followed_id == user.id, Follow.approved == True).execute()
+        else:
+            return 0
+    
+    def cancel_request(self, user):
+        from models.follow import Follow
+        if self.is_requesting(user):
+            Follow.delete().where(Follow.follower_id == self.id, Follow.followed_id == user.id, Follow.approved == False).execute()
+        else:
+            return 0
+    
+    def reject(self, user):
+        from models.follow import Follow
+        if user.is_requesting(self):
+            Follow.delete().where(Follow.followed_id == self.id, Follow.follower_id == user.id, Follow.approved == False).execute()
+        else:
+            return 0
+
     def validate(self):
         duplicate_username = User.get_or_none(User.username == self.username)
         password_regex = r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}"

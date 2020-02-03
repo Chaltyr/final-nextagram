@@ -7,6 +7,6 @@ from models.user import User
 
 
 class User_img(BaseModel):
-    username = pw.CharField(unique=True)
+    # username = pw.CharField(unique=True)
     user_image = pw.CharField()
-    User = pw.ForeignKeyField(User, backref="user_images")
+    user = pw.ForeignKeyField(User, backref="user_images")

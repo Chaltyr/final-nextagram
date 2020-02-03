@@ -5,15 +5,31 @@
 
 <h2>{{ user.username }}</h2>
 
+<style>
+
+.image {
+    margin: 30px;
+}
+
+#images {
+    display: flex;
+
+}
+</style>
+
 <div>
     <h3>Your images, you degenerate.</h3>
-    {% for image in images %}
-    <img src="{{ aws_domain }}{{ user_images.user_img }}" width="70" height="100"/><br/>
-    {% endfor %}
-
+    <h4>CAUTION</h4>
+    <h5>IMAGES UPLOADED WILL NOT BE REMOVABLE</h5>
+    <div id="images">
+        {% for image in images %}
+        <div class="image ">
+            <img  src="{{ aws_domain }}{{ image.user_image }}" width="200" height="225"/>
+            <a href="{{ url_for('endorsements.index', id=image.id) }}">Click here to endorse!!!</a>
+        </div>
+        {% endfor %}
+    </div>
+    <a href="{{ url_for('users.upload') }}">Click here to Upload your dumb photos!!! </a>
 </div>
-
-
-
 
 {% endblock %}

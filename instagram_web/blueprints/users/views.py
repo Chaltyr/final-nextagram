@@ -1,7 +1,10 @@
 from flask import Blueprint, render_template, flash, redirect, request, abort, session, url_for
 from models.user import User
+from models.user_images import User_img
 from flask_login import LoginManager, logout_user, login_required, login_user, current_user
 from instagram_web.util.helpers import upload_file_to_s3
+import os
+
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -39,7 +42,8 @@ def create():
 @users_blueprint.route('/<username>', methods=["GET"])
 def show(username):
     user = User.get(User.username==username)
-    return render_template("users/user_profile.html", user=user)
+    images = User_img.select().where(User_img.user==user.id)
+    return render_template("users/user_profile.html", images=images,user=user,aws_domain=os.getenv('AWS_DOMAIN'))
     abort(404)
 
 
@@ -53,36 +57,6 @@ def index():
 @users_blueprint.route('/<id>/edit', methods=['GET'])
 def edit(id):
     return render_template('users/edit.html', errors=['error1', 'error2'])
-
-@users_blueprint.route('/edit_img', methods=['GET'])
-def edit_img():
-    return render_template('users/edit_img.html')
-
-@users_blueprint.route('/img_update', methods=['POST'])
-def img_update():
-    if 'new_profile_img' not in request.files:
-        flash('No image_file key in request.files')
-        return redirect(url_for('users.edit_img'))
-
-    file = request.files['new_profile_img']
-
-    if file.filename == '':
-        flash('No file was selected')
-        return redirect(url_for('users.edit_img'))
-    
-    if file and allowed_file(file.filename):
-        output = upload_file_to_s3(file)
-        if output:
-            User.update(profile_img = output).where(User.id==current_user.id).execute()
-            flash('Upload success')
-            return redirect(url_for('home'))
-        else:
-            flash('Unable to upload, try again')
-            return redirect('edit_img')
-    else:
-        flash('File type not supported!!!')
-        return redirect(url_for('edit_img'))
-
 
 # users#update for form action
 @users_blueprint.route('/<id>', methods=['POST'])
@@ -112,6 +86,37 @@ def update(id):
             flash(user.errors)
             return render_template('users/edit.html', errors=user.errors)
 
+@users_blueprint.route('/edit_img', methods=['GET'])
+def edit_img():
+    return render_template('users/edit.html')
+
+@users_blueprint.route('/img_update', methods=['POST'])
+def img_update():
+    if 'new_profile_img' not in request.files:
+        flash('No image_file key in request.files')
+        return redirect(url_for('users.edit_img'))
+
+    file = request.files['new_profile_img']
+
+    if file.filename == '':
+        flash('No file was selected')
+        return redirect(url_for('users.edit_img'))
+    
+    if file and allowed_file(file.filename):
+        output = upload_file_to_s3(file)
+        if output:
+            User.update(profile_img = output).where(User.id==current_user.id).execute()
+            flash('Upload success')
+            return redirect(url_for('home'))
+        else:
+            flash('Unable to upload, try again')
+            return redirect('edit_img')
+    else:
+        flash('File type not supported!!!')
+        return redirect(url_for('edit_img'))
+
+
+
 @users_blueprint.route('/upload', methods=['GET'])
 def upload():
     return render_template('users/img_upload.html')
@@ -131,9 +136,10 @@ def img_upload():
     if file and allowed_file(file.filename):
         output = upload_file_to_s3(file)
         if output:
-            User.update(profile_img = output).where(User.id==current_user.id).execute()
+            User_img(user=current_user.id, user_image=output).save()
+            # User.update(profile_img = output).where(User.id==current_user.id).execute()
             flash('Upload success')
-            return redirect(url_for('home'))
+            return redirect(url_for('users.show', username=current_user.username))
         else:
             flash('Unable to upload, try again')
             return redirect('upload')

@@ -3,7 +3,8 @@ from flask_login import LoginManager, logout_user, login_required, login_user
 from models.user import *
 from app import app
 from werkzeug.security import check_password_hash
-from models.user import *
+from instagram_web.helpers.google_oauth import oauth
+# from models.user import *
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -46,3 +47,25 @@ def create():
 def destroy():
     logout_user()
     return redirect(url_for('sessions.new'))
+
+@sessions_blueprint.route('/google', methods=['GET'])
+def google():
+    redirect_uri = url_for('sessions.authorize',_external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+@sessions_blueprint.route('/authorize')
+# @login_required
+def authorize():
+    token = oauth.google.authorize_access_token()
+    email = oauth.google.get('https://www.googleapis.com/oauth2/v2/userinfo').json()['email']
+    info = oauth.google.get('https://www.googleapis.com/oauth2/v2/userinfo').json()
+    print(info)
+    user = User.get_or_none(User.email == email)
+    if user:
+        login_user(user)
+
+        flash(f'Google email: {email} login success!!!!!!!!!')
+        return redirect(url_for('users.show', username=user.username))
+    else:
+        flash(f'{email} is not registered!!!')
+        return redirect(url_for('sessions.new'))
