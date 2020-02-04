@@ -16,33 +16,47 @@ class User(UserMixin, BaseModel):
             follow = Follow(follower_id=self.id, followed_id=user.id)
             follow.save()
         else:
-            return 0
+            return 0  
 
-    def approve(self, user):
+    def unfollow(self, user):
+        from models.follow import Follow
+        if self.is_following(user):
+            Follow.delete().where(Follow.follower_id == self.id, Follow.followed_id == user.id, Follow.approved == True).execute()
+        else:
+            return 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+
+    def approve(self, user):                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
         from models.follow import Follow
         if user.is_requesting(self):
-            Follow.update(approve=True).where(Follow.followed_id == self.id, Follow.follower_id == user.id).execute()
+            Follow.update(approved=True).where(Follow.followed_id == self.id, Follow.follower_id == user.id).execute()
+        else:
+            return 0
+
+    def reject(self, user):
+        from models.follow import Follow
+        if user.is_requesting(self):
+            Follow.delete().where(Follow.followed_id == self.id, Follow.follower_id == user.id, Follow.approved == False).execute()
         else:
             return 0
 
     def get_requests(self):
         from models.follow import Follow
-        result = User.select().join(Follow, on=(follower_id==User.id).where(Follow.followed_id==self.id, Follow.approved==False))
-        return result
-
-    def get_follower(self):
-        from models.follow import Follow
-        result = User.select().join(Follow, on=(follower_id==User.id).where(Follow.followed_id==self.id, Follow.approved==True))
+        result = User.select().join(Follow, on=(Follow.follower_id==User.id)).where(Follow.followed_id==self.id, Follow.approved==False)
         return result
 
     def get_requesting(self):
         from models.follow import Follow
-        result = User.select().join(Follow, on=(followed_id==User.id).where(Follow.follower_id==self.id, Follow.approved==False))
+        result = User.select().join(Follow, on=(Follow.followed_id==User.id)).where(Follow.follower_id==self.id, Follow.approved==False)
+        return result
+
+    def get_followers(self):
+        from models.follow import Follow
+        result = User.select().join(Follow, on=(Follow.follower_id==User.id)).where(Follow.followed_id==self.id, Follow.approved==True)
         return result
 
     def get_following(self):
         from models.follow import Follow
-        result = User.select().join(Follow, on=(followed_id==User.id).where(Follow.follower_id==self.id, Follow.approved==True))
+        result = User.select().join(Follow, on=(Follow.followed_id==User.id)).where(Follow.follower_id==self.id, Follow.approved==True)
         return result
 
     def is_following(self, user):
@@ -60,25 +74,11 @@ class User(UserMixin, BaseModel):
             return True
         else:
             return False
-
-    def unfollow(self, user):
-        from models.follow import Follow
-        if self.is_following(user):
-            Follow.delete().where(Follow.follower_id == self.id, Follow.followed_id == user.id, Follow.approved == True).execute()
-        else:
-            return 0
     
     def cancel_request(self, user):
         from models.follow import Follow
         if self.is_requesting(user):
             Follow.delete().where(Follow.follower_id == self.id, Follow.followed_id == user.id, Follow.approved == False).execute()
-        else:
-            return 0
-    
-    def reject(self, user):
-        from models.follow import Follow
-        if user.is_requesting(self):
-            Follow.delete().where(Follow.followed_id == self.id, Follow.follower_id == user.id, Follow.approved == False).execute()
         else:
             return 0
 

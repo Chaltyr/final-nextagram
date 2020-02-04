@@ -1,0 +1,23 @@
+{% extends "_layout.html" %}
+{% block content %}
+<h3> Followers Approval pending List</h3>
+{% for user in current_user.get_requests() %}
+    <p>{{ user.username }} | <a href="{{ url_for('follows.approve', id=user.id) }}">Approve</a> </p>
+{% endfor %}
+
+<h3> Followers List </h3>
+{% for user in current_user.get_followers() %}
+<p>{{ user.username }}</p>
+{% endfor %}
+
+<h3> Requests </h3>
+{% for user in current_user.get_requests() %}
+<p>{{ user.username }}</p>
+{% endfor %}
+
+<h3> Requesting </h3>
+{% for user in current_user.get_requesting() %}
+<p>{{ user.username }} <a href="{{ url_for('follows.cancel', id=user.id) }}">Cancel request</a></p>
+{% endfor %}
+
+{% endblock %}

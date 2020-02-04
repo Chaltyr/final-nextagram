@@ -51,7 +51,7 @@ def show(username):
 @users_blueprint.route('/', methods=["GET"])
 def index():
     user = User.select()
-    return render_template('users/home.html', users=user)
+    return render_template('home.html', users=user)
 
 # users#edit - show user edit page
 @users_blueprint.route('/<id>/edit', methods=['GET'])
@@ -115,8 +115,6 @@ def img_update():
         flash('File type not supported!!!')
         return redirect(url_for('edit_img'))
 
-
-
 @users_blueprint.route('/upload', methods=['GET'])
 def upload():
     return render_template('users/img_upload.html')
@@ -142,10 +140,13 @@ def img_upload():
             return redirect(url_for('users.show', username=current_user.username))
         else:
             flash('Unable to upload, try again')
-            return redirect('upload')
+            return redirect(url_for('upload'))
     else:
         flash('File type not supported!!!')
         return redirect(url_for('upload'))
+
+
+
 
 
     

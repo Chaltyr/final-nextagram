@@ -5,15 +5,18 @@
 
 <h2>{{ user.username }}</h2>
 
-<style>
+<h3>Followers: {{ user.get_following() | length }}</h3>
+<h3>Followed: {{ user.get_followers() | length }}</h3>
 
+
+
+<style>
 .image {
     margin: 30px;
 }
 
 #images {
     display: flex;
-
 }
 </style>
 
@@ -29,7 +32,25 @@
         </div>
         {% endfor %}
     </div>
-    <a href="{{ url_for('users.upload') }}">Click here to Upload your dumb photos!!! </a>
+    <a href="{{ url_for('users.upload') }}">Click here to Upload your dumb photos!!!</a>
+
+</div>
+
+<div>
+    {# <form action="{{ url_for('users.follow') }}", method='POST'>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="submit" value="Follow"/>
+    </form> #}
+    {% if current_user.is_authenticated and current_user.id != user.id %}
+    {% if current_user.is_following(user) %}
+    <a href="{{ url_for('follows.unfollow', id=user.id) }}" >Unfollow</a>
+    {% elif current_user.is_requesting(user) %}
+    <a href="{{ url_for('follows.cancel', id=user.id) }}" >Cancel Request</a>
+    {% else %}
+    <a href="{{ url_for('follows.follow', id=user.id) }}" >Follow</a>
+    {% endif %}
+    {% endif %}
+
 </div>
 
 {% endblock %}

@@ -19,12 +19,14 @@
 
     <title>
       {% block title %}
-      {% endblock %}NEXTAGRAM
+        NEXTAGRAM
+      {% endblock %}
     </title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   </head>
   <body>
     <nav class="nav">
+      <a href="#" class="pull-left"><img src="/nextagram.png"></a> 
       <a class="nav-link" href="{{ url_for('home') }}">Homepage</a>
       {% if current_user.is_authenticated == False %}
       <a class="nav-link" href="{{ url_for('sessions.new') }}">Login</a>
@@ -33,6 +35,7 @@
       <a class="nav-link" href="{{ url_for('users.show', username=current_user.username) }}">Your Profile Page</a>
       <a class="nav-link" href="{{ url_for('sessions.destroy') }}">Logout</a>
       <a class="nav-link" href="{{ url_for('users.edit',id=current_user.id)}}">Edit Profile</a>
+      <a class="nav-link" href="{{ url_for('follows.show', id=current_user.id) }}">Followers</a>
       {% endif %}
       <!-- <a class="nav-link" href="{{ url_for('users.index') }}">User List</a> -->
       <a class="nav-link" href="{{ url_for('users.new') }}">Sign up</a>
