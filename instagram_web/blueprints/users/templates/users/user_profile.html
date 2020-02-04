@@ -50,7 +50,7 @@
     <a href="{{ url_for('follows.follow', id=user.id) }}" >Follow</a>
     {% endif %}
     {% endif %}
-
+    <a href="{{ url_for('follows.approve', id=user.id) }}">Go to approval list</a>
 </div>
 
 {% endblock %}

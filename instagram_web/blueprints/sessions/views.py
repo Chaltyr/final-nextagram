@@ -33,7 +33,7 @@ def create():
         if result:
             login_user(user)
             flash("success login!","danger")
-            return redirect(url_for("users.index"))
+            return redirect(url_for("home"))
         else:
             flash("cannot login!", "danger")
             return redirect(url_for("sessions.new"))
@@ -59,7 +59,6 @@ def authorize():
     token = oauth.google.authorize_access_token()
     email = oauth.google.get('https://www.googleapis.com/oauth2/v2/userinfo').json()['email']
     info = oauth.google.get('https://www.googleapis.com/oauth2/v2/userinfo').json()
-    print(info)
     user = User.get_or_none(User.email == email)
     if user:
         login_user(user)

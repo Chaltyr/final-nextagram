@@ -22,37 +22,43 @@
         NEXTAGRAM
       {% endblock %}
     </title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/bootstrap.min.css') }}"> -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"> -->
   </head>
   <body>
-    <nav class="nav">
-      <a href="#" class="pull-left"><img src="/nextagram.png"></a> 
-      <a class="nav-link" href="{{ url_for('home') }}">Homepage</a>
-      {% if current_user.is_authenticated == False %}
-      <a class="nav-link" href="{{ url_for('sessions.new') }}">Login</a>
-      {% endif %}
-      {% if current_user.is_authenticated %}
-      <a class="nav-link" href="{{ url_for('users.show', username=current_user.username) }}">Your Profile Page</a>
-      <a class="nav-link" href="{{ url_for('sessions.destroy') }}">Logout</a>
-      <a class="nav-link" href="{{ url_for('users.edit',id=current_user.id)}}">Edit Profile</a>
-      <a class="nav-link" href="{{ url_for('follows.show', id=current_user.id) }}">Followers</a>
-      {% endif %}
-      <!-- <a class="nav-link" href="{{ url_for('users.index') }}">User List</a> -->
-      <a class="nav-link" href="{{ url_for('users.new') }}">Sign up</a>
+    <nav class="nav" style="display: flex; justify-content: space-between;">
+      <div>
+        <a href="#" class="pull-left"><img src="{{ url_for('static', filename='images/nextagram.png') }}" style="display: inline-block; height: 50px; width: 175  px;"></a> 
+      </div>
+      <div style="display: flex;">
+        <a class="nav-link" href="{{ url_for('home') }}">Homepage</a>
+        {% if current_user.is_authenticated == False %}
+        <a class="nav-link" href="{{ url_for('sessions.new') }}">Login</a>
+        {% endif %}
+        {% if current_user.is_authenticated %}
+        <a class="nav-link" href="{{ url_for('users.show', username=current_user.username) }}">Your Profile Page</a>
+        <a class="nav-link" href="{{ url_for('sessions.destroy') }}">Logout</a>
+        <a class="nav-link" href="{{ url_for('users.edit',id=current_user.id)}}">Edit Profile</a>
+        <a class="nav-link" href="{{ url_for('follows.show', id=current_user.id) }}">Followers</a>
+        {% endif %}
+        <!-- <a class="nav-link" href="{{ url_for('users.index') }}">User List</a> -->
+        <a class="nav-link" href="{{ url_for('users.new') }}">Sign up</a>
     </nav>
+        
       
-    
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    {% block content %}
-    {% endblock %}
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <ul class=flashes>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+      {% endwith %}
+      {% block content %}
+      {% endblock %}
+      </div>
+      
     <footer>
       Made with &hearts; at <a target="_blank" href="https://www.nextacademy.com/?utm_source=github&utm_medium=student-challenge&utm_campaign=flask-nextagram">NEXT Academy</a>
     </footer>
